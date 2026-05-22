@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地圖製造 · 客服問答系統</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif; background: #f5f6fa; color: #333; min-height: 100vh; }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 24px 20px 20px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+  .header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; }
+  .header p { font-size: 0.85rem; opacity: 0.8; margin-top: 4px; }
+
+  /* Search */
+  .search-bar { padding: 14px 16px 10px; background: white; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .search-input { width: 100%; padding: 11px 18px; border: 2px solid #e0e0e0; border-radius: 24px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+  .search-input:focus { border-color: #3498db; }
+
+  /* Category tabs - single row */
+  .tabs { display: flex; gap: 8px; padding: 12px 16px; background: #f5f6fa; border-bottom: 1px solid #e0e0e0; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 10px 20px; border-radius: 10px; border: 2px solid #e0e0e0;
+    cursor: pointer; font-size: 1.05rem; font-weight: 700;
+    background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    color: #444; white-space: nowrap;
+    transition: all 0.18s; user-select: none;
+  }
+  .tab.active { color: white; border-color: transparent; box-shadow: 0 3px 10px rgba(0,0,0,0.15); }
+  .tab:not(.active):hover { background: #eee; }
+
+  /* Category colors */
+  .cat-all.active { background: #444; border-color: #444; }
+  .cat-towel.active { background: #27ae60; border-color: #27ae60; }
+  .cat-luggage.active { background: #e67e22; border-color: #e67e22; }
+  .cat-tissue.active { background: #9b59b6; border-color: #9b59b6; }
+  .cat-pet.active { background: #e74c3c; border-color: #e74c3c; }
+  .cat-kids.active { background: #f39c12; border-color: #f39c12; }
+  .cat-faq.active { background: #3498db; border-color: #3498db; }
+  .cat-shipping.active { background: #1abc9c; border-color: #1abc9c; }
+  .cat-urgent.active { background: #c0392b; border-color: #c0392b; }
+
+  /* Content area */
+  .content { padding: 12px 16px 80px; max-width: 680px; margin: 0 auto; }
+  .result-count { font-size: 0.78rem; color: #999; margin-bottom: 10px; padding: 4px 0; }
+
+  /* Cards */
+  .card { background: white; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; transition: box-shadow 0.2s; }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+  .card-header { padding: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .cat-badge { flex-shrink: 0; padding: 3px 9px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; color: white; }
+  .card-question { font-size: 0.95rem; font-weight: 600; flex: 1; line-height: 1.4; }
+  .header-actions { flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
+  .copy-btn {
+    padding: 6px 14px; background: #3498db; color: white; border: none;
+    border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .copy-btn:hover { background: #2980b9; }
+  .copy-btn.copied { background: #27ae60; }
+  .toggle-icon { font-size: 0.75rem; color: #bbb; transition: transform 0.2s; }
+  .card.open .toggle-icon { transform: rotate(180deg); }
+
+  .card-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+  .card.open .card-body { max-height: 2000px; }
+  .card-answer { padding: 0 14px 14px; }
+  .answer-text { background: #f8f9fa; border-left: 3px solid #3498db; padding: 10px 12px; border-radius: 0 8px 8px 0; font-size: 0.85rem; line-height: 1.7; white-space: pre-wrap; word-break: break-word; color: #444; }
+
+  /* Note cards */
+  .card-note { background: #fff8e1; border-left: 3px solid #f39c12; padding: 8px 12px; border-radius: 0 8px 8px 0; font-size: 0.82rem; color: #7d6608; margin-top: 6px; line-height: 1.6; white-space: pre-wrap; }
+
+  /* Empty state */
+  .empty { text-align: center; padding: 40px 20px; color: #aaa; }
+  .empty-icon { font-size: 2rem; margin-bottom: 10px; }
+
+  /* Floating quick-copy hint */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px); background: #2c3e50; color: white; padding: 10px 22px; border-radius: 24px; font-size: 0.85rem; opacity: 0; transition: all 0.3s; z-index: 999; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🗺️ 地圖製造 · 客服問答</h1>
+  <p>搜尋問題 · 點擊展開 · 一鍵複製回覆</p>
+</div>
+
+<div class="search-bar">
+  <input class="search-input" type="text" id="searchInput" placeholder="🔍 搜尋問題或關鍵字..." oninput="filterCards()">
+</div>
+
+<div class="tabs" id="tabs">
+  <div class="tab cat-all active" onclick="setTab('all', this)">全部</div>
+  <div class="tab cat-towel" onclick="setTab('towel', this)">毛巾</div>
+  <div class="tab cat-luggage" onclick="setTab('luggage', this)">行李箱套</div>
+  <div class="tab cat-tissue" onclick="setTab('tissue', this)">面紙</div>
+  <div class="tab cat-pet" onclick="setTab('pet', this)">寵物抱枕</div>
+  <div class="tab cat-kids" onclick="setTab('kids', this)">小朋友衣服</div>
+  <div class="tab cat-faq" onclick="setTab('faq', this)">常見問題</div>
+  <div class="tab cat-shipping" onclick="setTab('shipping', this)">出貨時間</div>
+  <div class="tab cat-urgent" onclick="setTab('urgent', this)">急件</div>
+</div>
+
+<div class="content">
+  <div class="result-count" id="resultCount"></div>
+  <div id="cardList"></div>
+  <div class="empty" id="emptyState" style="display:none;">
+    <div class="empty-icon">🔍</div>
+    <div>找不到相關問題</div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ 已複製到剪貼簿</div>
+
+<script>
+const data = [
+  // ===== 毛巾 =====
+  {
+    cat: 'towel',
+    catLabel: '毛巾',
+    catColor: '
