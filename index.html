@@ -8,6 +8,37 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif; background: #f5f6fa; color: #333; min-height: 100vh; }
 
+  /* Password overlay */
+  #pw-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  #pw-box {
+    background: white; border-radius: 20px; padding: 40px 32px 36px;
+    width: 320px; max-width: 90vw; text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+  }
+  #pw-box h2 { font-size: 1.3rem; color: #2c3e50; margin-bottom: 6px; }
+  #pw-box p { font-size: 0.85rem; color: #888; margin-bottom: 24px; }
+  #pw-input {
+    width: 100%; padding: 12px 18px; border: 2px solid #e0e0e0; border-radius: 12px;
+    font-size: 1.1rem; outline: none; text-align: center; letter-spacing: 3px;
+    transition: border-color 0.2s; margin-bottom: 14px;
+  }
+  #pw-input:focus { border-color: #3498db; }
+  #pw-input.error { border-color: #e74c3c; animation: shake 0.3s; }
+  #pw-btn {
+    width: 100%; padding: 13px; background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  #pw-btn:hover { opacity: 0.9; }
+  #pw-err { color: #e74c3c; font-size: 0.85rem; margin-top: 10px; min-height: 18px; }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+  }
+
   /* Header */
   .header { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 24px 20px 20px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
   .header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; }
@@ -84,6 +115,18 @@
 </head>
 <body>
 
+<!-- Password overlay -->
+<div id="pw-overlay">
+  <div id="pw-box">
+    <h2>🗺️ 地圖製造客服系統</h2>
+    <p>請輸入密碼以繼續</p>
+    <input type="password" id="pw-input" placeholder="輸入密碼" autocomplete="off" />
+    <button id="pw-btn" onclick="checkPw()">進入系統</button>
+    <div id="pw-err"></div>
+  </div>
+</div>
+
+
 <div class="header">
   <h1>🗺️ 地圖製造 · 客服問答</h1>
   <p>搜尋問題 · 點擊展開 · 一鍵複製回覆</p>
@@ -124,7 +167,16 @@ const data = [
     catLabel: '毛巾',
     catColor: '#27ae60',
     q: '一條毛巾報價',
-    a: "您好，客製化毛巾一條450元\n連結可以直接下單 https://www.makeworld.tw/product/product&product_id=699\n\n下單後來信圖檔即可\n--來信mail標題為訂單編號+姓名--\nmakeworld.design@gmail.com\n\n如果大量可以另外報價唷！\n當然，我們也有協助排版設計的服務，也會有排版費用，\n但我們都是報價後確認沒問題執行才會開始收費，請放心詢問喔",
+    a: `您好，客製化毛巾一條450元
+連結可以直接下單 https://www.makeworld.tw/product/product&product_id=699
+
+下單後來信圖檔即可
+--來信mail標題為訂單編號+姓名--
+makeworld.design@gmail.com
+
+如果大量可以另外報價唷！
+當然，我們也有協助排版設計的服務，也會有排版費用，
+但我們都是報價後確認沒問題執行才會開始收費，請放心詢問喔`,
     note: ''
   },
   {
@@ -132,7 +184,13 @@ const data = [
     catLabel: '毛巾',
     catColor: '#27ae60',
     q: '團體毛巾詢問 / 大量訂製',
-    a: "您好，請問想要訂製團體毛巾嗎？\n麻煩回覆以下問題，這樣報價會更明確唷！\n\n1. 是否有自備設計，或者需要我們協助設計？\n2. 如果需要我們協助設計，需求內容為？\n3. 是否有偏好材質？\n4. 預計數量為？",
+    a: `您好，請問想要訂製團體毛巾嗎？
+麻煩回覆以下問題，這樣報價會更明確唷！
+
+1. 是否有自備設計，或者需要我們協助設計？
+2. 如果需要我們協助設計，需求內容為？
+3. 是否有偏好材質？
+4. 預計數量為？`,
     note: ''
   },
   {
@@ -140,7 +198,16 @@ const data = [
     catLabel: '毛巾',
     catColor: '#27ae60',
     q: '毛巾材質介紹',
-    a: "一般來說我們協助做運動毛巾浴巾，有三種材質：\n\n🔹 基礎材質（輕薄好攜帶，快速乾燥）\nhttps://www.facebook.com/makemap/photos/pcb.2169551803191835/2169547959858886\n\n🔹 環保材質（30% PET寶特瓶回收紗，顏色飽和手感較厚）\nhttps://www.facebook.com/makemap/posts/2197607933719555\n\n🔹 純棉材質\nhttps://www.facebook.com/makemap/photos/pcb.1790969904383362/1790962571050762",
+    a: `一般來說我們協助做運動毛巾浴巾，有三種材質：
+
+🔹 基礎材質（輕薄好攜帶，快速乾燥）
+https://www.facebook.com/makemap/photos/pcb.2169551803191835/2169547959858886
+
+🔹 環保材質（30% PET寶特瓶回收紗，顏色飽和手感較厚）
+https://www.facebook.com/makemap/posts/2197607933719555
+
+🔹 純棉材質
+https://www.facebook.com/makemap/photos/pcb.1790969904383362/1790962571050762`,
     note: ''
   },
   {
@@ -148,7 +215,11 @@ const data = [
     catLabel: '毛巾',
     catColor: '#27ae60',
     q: '毛巾出現毛球 / 纖維露白問題',
-    a: "熱昇華毛巾是藉由熱加壓滾印，\n因此新品表面會比較平整，您拍照的部分是局部逆毛或者纖維立起來露白的情況\n（折疊毛巾、拿進出袋子都有可能導致）\n\n只要正常下水使用，就會逐漸趨於一致喔！",
+    a: `熱昇華毛巾是藉由熱加壓滾印，
+因此新品表面會比較平整，您拍照的部分是局部逆毛或者纖維立起來露白的情況
+（折疊毛巾、拿進出袋子都有可能導致）
+
+只要正常下水使用，就會逐漸趨於一致喔！`,
     note: ''
   },
   {
@@ -156,7 +227,14 @@ const data = [
     catLabel: '毛巾',
     catColor: '#27ae60',
     q: '純棉雙色緹花毛巾報價',
-    a: "純棉雙色緹花毛巾一定要看顏色才能報價唷，因為價格跟紗線息息相關。\n至少50起訂，但是50條會有允收條件。\n\n允收條件說明：不管最後生產數量多少，多的一律購買，少的退費。\n會這樣的原因是因為一百條內數量很難拿捏，無法保證一定會做剛好。\n\n舉例：如果單價是400元，最後做了58條，則多收8×400；\n如果最後做42條，則退您8×400元。",
+    a: `純棉雙色緹花毛巾一定要看顏色才能報價唷，因為價格跟紗線息息相關。
+至少50起訂，但是50條會有允收條件。
+
+允收條件說明：不管最後生產數量多少，多的一律購買，少的退費。
+會這樣的原因是因為一百條內數量很難拿捏，無法保證一定會做剛好。
+
+舉例：如果單價是400元，最後做了58條，則多收8×400；
+如果最後做42條，則退您8×400元。`,
     note: ''
   },
 
@@ -166,7 +244,14 @@ const data = [
     catLabel: '行李箱套',
     catColor: '#e67e22',
     q: '行李箱套報價 / 下單',
-    a: "您好，\n目前優惠價格為1279元免運\n這邊可以下單：\nhttps://www.makeworld.tw/product/product&product_id=786\n\n下單後來信圖片\n--來信mail標題為訂單編號+姓名--\nmakeworld.design@gmail.com",
+    a: `您好，
+目前優惠價格為1279元免運
+這邊可以下單：
+https://www.makeworld.tw/product/product&product_id=786
+
+下單後來信圖片
+--來信mail標題為訂單編號+姓名--
+makeworld.design@gmail.com`,
     note: ''
   },
   {
@@ -174,7 +259,17 @@ const data = [
     catLabel: '行李箱套',
     catColor: '#e67e22',
     q: '行李箱套：選雙面相同但來了兩張照片',
-    a: "您好，\n有看到您訂單是選擇雙面相同，卻來信兩張照片，\n請問是想做雙面不同照片嗎？這樣會有100元價差，\n請補轉帳\n\n700郵局04012210503831\n\n轉帳後提供末五碼即可\n\n又或者維持原方案，再告訴我要用哪張照片即可\n謝謝您！",
+    a: `您好，
+有看到您訂單是選擇雙面相同，卻來信兩張照片，
+請問是想做雙面不同照片嗎？這樣會有100元價差，
+請補轉帳
+
+700郵局04012210503831
+
+轉帳後提供末五碼即可
+
+又或者維持原方案，再告訴我要用哪張照片即可
+謝謝您！`,
     note: ''
   },
 
@@ -184,7 +279,20 @@ const data = [
     catLabel: '面紙',
     catColor: '#9b59b6',
     q: '面紙報價（含排版設計）',
-    a: "你好，面紙基本量100包，目前優惠1059元\n如果需要我們排版如粉絲團風格就是600元\n獨立運費140元\n金額為 1059 + 600 + 140 = 1799元\n\n需要排版的話直接私訊跟我下單即可\n\n700郵局04012210503831\n\n轉帳後麻煩提供：\n1. 姓名電話地址\n2. 照片及想要放置的前後文字\n\n＊合板印刷多少一定都會有色差，非常講究者需注意",
+    a: `你好，面紙基本量100包，目前優惠1059元
+如果需要我們排版如粉絲團風格就是600元
+獨立運費140元
+金額為 1059 + 600 + 140 = 1799元
+
+需要排版的話直接私訊跟我下單即可
+
+700郵局04012210503831
+
+轉帳後麻煩提供：
+1. 姓名電話地址
+2. 照片及想要放置的前後文字
+
+＊合板印刷多少一定都會有色差，非常講究者需注意`,
     note: ''
   },
   {
@@ -192,7 +300,13 @@ const data = [
     catLabel: '面紙',
     catColor: '#9b59b6',
     q: '面紙報價（自備稿件）',
-    a: "自備稿件的話就是不用600元排版費～\n金額為 1059 + 140 = 1199元\n直接下單mail檔案給我即可\nhttps://reurl.cc/2QMVe4\n\n--來信mail標題為訂單編號+姓名--\nmakeworld.design@gmail.com",
+    a: `自備稿件的話就是不用600元排版費～
+金額為 1059 + 140 = 1199元
+直接下單mail檔案給我即可
+https://reurl.cc/2QMVe4
+
+--來信mail標題為訂單編號+姓名--
+makeworld.design@gmail.com`,
     note: ''
   },
   {
@@ -200,7 +314,13 @@ const data = [
     catLabel: '面紙',
     catColor: '#9b59b6',
     q: '面紙排版費確認',
-    a: "您好，\n面紙如果需要排版，會有排版費用600元喔\n如果確認委託，麻煩轉帳至：\n700郵局04012210503831\n轉帳後回信即可\n\n當然您也可以自己排版完成，就不會有排版費囉",
+    a: `您好，
+面紙如果需要排版，會有排版費用600元喔
+如果確認委託，麻煩轉帳至：
+700郵局04012210503831
+轉帳後回信即可
+
+當然您也可以自己排版完成，就不會有排版費囉`,
     note: ''
   },
 
@@ -210,7 +330,21 @@ const data = [
     catLabel: '寵物抱枕',
     catColor: '#e74c3c',
     q: '寵物抱枕（狗貓乾）報價 / 下單',
-    a: "你好，抱枕費用為799元\n最長邊約45~50cm（依姿體狀況）\n提供照片即可製作\n\n這邊可以下單：https://reurl.cc/daQWzD\n\n下單後來信圖檔即可\n--來信mail標題為訂單編號+姓名--\nmakeworld.design@gmail.com\n\n＊提醒：\n1. 如果照片本身肢體有被截到，實際完成也會截到，建議選擇肢體完整照片\n2. 至少手機拍攝水準，網路抓圖或截圖可能會馬賽克\n3. 有任何疑問建議先詢問，不要先下單付款\n4. 製作時間抓2-3週",
+    a: `你好，抱枕費用為799元
+最長邊約45~50cm（依姿體狀況）
+提供照片即可製作
+
+這邊可以下單：https://reurl.cc/daQWzD
+
+下單後來信圖檔即可
+--來信mail標題為訂單編號+姓名--
+makeworld.design@gmail.com
+
+＊提醒：
+1. 如果照片本身肢體有被截到，實際完成也會截到，建議選擇肢體完整照片
+2. 至少手機拍攝水準，網路抓圖或截圖可能會馬賽克
+3. 有任何疑問建議先詢問，不要先下單付款
+4. 製作時間抓2-3週`,
     note: ''
   },
 
@@ -220,7 +354,21 @@ const data = [
     catLabel: '小朋友衣服',
     catColor: '#f39c12',
     q: '小朋友衣服印製報價',
-    a: "您好，小朋友衣服印製可以參考我們的方案，\n您也可以傳圖給我評估適合的印製方式唷！\n\n除了最基礎款外，其餘皆是680元\n\n我們會看您提供的圖片採取建議的印製方式，\n一般來說會以數位印刷為優先，但如果筆畫太淡太細太亂，\n都還是建議其他印刷方法會比較好。\n\n直接下單連結：https://reurl.cc/1K2Ro9\n下單後來信圖檔即可\n--來信mail標題為訂單編號+姓名--\nmakeworld.design@gmail.com\n\n或者私訊跟我下單也可以～",
+    a: `您好，小朋友衣服印製可以參考我們的方案，
+您也可以傳圖給我評估適合的印製方式唷！
+
+除了最基礎款外，其餘皆是680元
+
+我們會看您提供的圖片採取建議的印製方式，
+一般來說會以數位印刷為優先，但如果筆畫太淡太細太亂，
+都還是建議其他印刷方法會比較好。
+
+直接下單連結：https://reurl.cc/1K2Ro9
+下單後來信圖檔即可
+--來信mail標題為訂單編號+姓名--
+makeworld.design@gmail.com
+
+或者私訊跟我下單也可以～`,
     note: ''
   },
 
@@ -230,7 +378,12 @@ const data = [
     catLabel: '常見問題',
     catColor: '#3498db',
     q: '超商取件被退回怎麼辦',
-    a: "1️⃣ 若已退回：\n收到退款後直接重新打包寄出，請客戶補轉運費60元\n轉帳：700郵局04012210503831\n\n2️⃣ 若還沒退回：\n要打工作單，提醒領回後重新寄出",
+    a: `1️⃣ 若已退回：
+收到退款後直接重新打包寄出，請客戶補轉運費60元
+轉帳：700郵局04012210503831
+
+2️⃣ 若還沒退回：
+要打工作單，提醒領回後重新寄出`,
     note: '📌 先查訂單狀態確認是否已退回'
   },
   {
@@ -238,7 +391,16 @@ const data = [
     catLabel: '常見問題',
     catColor: '#3498db',
     q: '產品是否台灣製造（MIT）',
-    a: "您好，我們大部分產品都是MIT！\n\n只有衣服的部分是跟合作工廠訂製，是越南製，\n但也是在台灣我們公司自己印製的。\n\n台灣並不產棉，所以衣服要到什麼程度才能稱為台灣製，\n法規說明是加工印刷後即可稱為台灣製，\n但我們知道消費者會在意這部分，所以都還是誠實說明～\n\n如果是海外生產，是無法做到像我們下單後生產＆出貨速度的",
+    a: `您好，我們大部分產品都是MIT！
+
+只有衣服的部分是跟合作工廠訂製，是越南製，
+但也是在台灣我們公司自己印製的。
+
+台灣並不產棉，所以衣服要到什麼程度才能稱為台灣製，
+法規說明是加工印刷後即可稱為台灣製，
+但我們知道消費者會在意這部分，所以都還是誠實說明～
+
+如果是海外生產，是無法做到像我們下單後生產＆出貨速度的`,
     note: ''
   },
   {
@@ -246,7 +408,11 @@ const data = [
     catLabel: '常見問題',
     catColor: '#3498db',
     q: '轉帳很久沒收到 / 付款未更新',
-    a: "您好，我們在下單流程有說明，轉帳要填寫轉帳通知，\n我們才會知道該筆款項的主人，也才有辦法幫您作業，\n\n如果您已經轉帳，請提供轉帳末五碼還有時間～\n我立即幫您處理！",
+    a: `您好，我們在下單流程有說明，轉帳要填寫轉帳通知，
+我們才會知道該筆款項的主人，也才有辦法幫您作業，
+
+如果您已經轉帳，請提供轉帳末五碼還有時間～
+我立即幫您處理！`,
     note: '📌 查訂單狀態，通常是「轉帳待查顯示未付款」'
   },
   {
@@ -254,7 +420,11 @@ const data = [
     catLabel: '常見問題',
     catColor: '#3498db',
     q: '私訊下單付款流程',
-    a: "A. 加總品項金額\nB. 請客戶轉帳至：700郵局04012210503831 並提供轉帳成功截圖\nC. 跟客戶要收件資訊（姓名、電話、地址）\n\n通常客戶提供截圖或轉帳資訊後，就可以直接改為已付款。",
+    a: `A. 加總品項金額
+B. 請客戶轉帳至：700郵局04012210503831 並提供轉帳成功截圖
+C. 跟客戶要收件資訊（姓名、電話、地址）
+
+通常客戶提供截圖或轉帳資訊後，就可以直接改為已付款。`,
     note: ''
   },
   {
@@ -262,7 +432,10 @@ const data = [
     catLabel: '常見問題',
     catColor: '#3498db',
     q: '已顯示配送但客戶沒收到 / 缺件',
-    a: "非常抱歉，原預計寄出時發現有瑕疵需要重新製作，\n但只要我們改變訂單狀態，系統會自動發信通知配送，\n目前訂單狀態依然為處理中，\n造成困擾非常抱歉！",
+    a: `非常抱歉，原預計寄出時發現有瑕疵需要重新製作，
+但只要我們改變訂單狀態，系統會自動發信通知配送，
+目前訂單狀態依然為處理中，
+造成困擾十分抱歉，目前確定可以寄出。`,
     note: '📌 印出單子，改為「處理中」狀態，主動聯絡客戶'
   },
   {
@@ -270,7 +443,13 @@ const data = [
     catLabel: '常見問題',
     catColor: '#3498db',
     q: '大量報價需求（客戶要大量訂製）',
-    a: "（說明自己是小幫手在回覆，先跟對方要mail或line，老闆稍晚會報價）\n\n麻煩提供以下資訊方便報價：\n1. 需求品項\n2. 預計數量\n3. 是否自備設計稿\n4. 聯絡方式（mail 或 line）",
+    a: `（說明自己是小幫手在回覆，先跟對方要mail或line，老闆稍晚會報價）
+
+麻煩提供以下資訊方便報價：
+1. 需求品項
+2. 預計數量
+3. 是否自備設計稿
+4. 聯絡方式（mail 或 line）`,
     note: '📌 整理好需求後轉給老闆，格式：帳號 + 品項 + 數量'
   },
   {
@@ -278,7 +457,8 @@ const data = [
     catLabel: '常見問題',
     catColor: '#3498db',
     q: '客服 Line @ 資訊',
-    a: "我們的 Line@：https://lin.ee/qmMYCJr\nID：@tkc3939y",
+    a: `我們的 Line@：https://lin.ee/qmMYCJr
+ID：@tkc3939y`,
     note: ''
   },
 
@@ -288,7 +468,10 @@ const data = [
     catLabel: '出貨時間',
     catColor: '#1abc9c',
     q: '毛巾 / 衣服 什麼時候出貨',
-    a: "正常時間是本週四五（或下週四五）寄出，\n請問您有時間壓力嗎？\n\n＊每週二中午前下單，原則上當週四五寄出",
+    a: `正常時間是本週四五（或下週四五）寄出，
+請問您有時間壓力嗎？
+
+＊每週二中午前下單，原則上當週四五寄出`,
     note: '📌 有時間壓力就需要急件作業（急件費 80元/件）'
   },
   {
@@ -296,7 +479,8 @@ const data = [
     catLabel: '出貨時間',
     catColor: '#1abc9c',
     q: '掛布 / 行李箱保護套 / 全彩排汗衫 出貨時間',
-    a: "這類商品製作時間約 2~3 週，\n如有急需請告知，我們會盡力協助確認排程。",
+    a: `這類商品製作時間約 2~3 週，
+如有急需請告知，我們會盡力協助確認排程。`,
     note: ''
   },
   {
@@ -304,7 +488,15 @@ const data = [
     catLabel: '出貨時間',
     catColor: '#1abc9c',
     q: '為什麼已顯示出貨但還沒寄？',
-    a: "非常抱歉！可能有以下原因：\n\nA. 寄出前發現NG需重新製作，\n預計當週四五或下週四五寄出（衣服需跟負責同事確認）\n\nB. 行李箱套比較久，同事誤以為可以出貨，\n改狀態會自動送出mail，現在已改為處理中\n\n造成困擾非常抱歉！",
+    a: `非常抱歉！可能有以下原因：
+
+A. 寄出前發現NG需重新製作，
+預計當週四五或下週四五寄出（衣服需跟負責同事確認）
+
+B. 行李箱套比較久，同事誤以為可以出貨，
+改狀態會自動送出mail，現在已改為處理中
+
+造成困擾非常抱歉！`,
     note: '📌 有改狀態但沒寄出，一律要主動聯絡客戶'
   },
   {
@@ -312,7 +504,16 @@ const data = [
     catLabel: '出貨時間',
     catColor: '#1abc9c',
     q: '衣服尺寸對照表',
-    a: "尺寸對照表：\n\nXS：肩寬42 / 胸圍95 / 建議身高155-160 / 建議體重40-50kg / 衣長68\nS：肩寬44 / 胸圍100 / 建議身高160-165 / 建議體重50-60kg / 衣長69.5\nM：肩寬45.5 / 胸圍105 / 建議身高165-170 / 建議體重60-70kg / 衣長71\nL：肩寬47 / 胸圍110 / 建議身高170-175 / 建議體重70-80kg / 衣長72.5\nXL：肩寬48.5 / 胸圍115 / 建議身高175-180 / 建議體重80-90kg / 衣長74\nXXL：肩寬50 / 胸圍120 / 建議身高180-185 / 建議體重90-100kg / 衣長75.5\nXXXL：肩寬51.5 / 胸圍125 / 建議身高185-190 / 建議體重100-110kg / 衣長77\n4XL：肩寬53 / 胸圍130 / 建議身高190-195 / 建議體重110-120kg / 衣長80",
+    a: `尺寸對照表：
+
+XS：肩寬42 / 胸圍95 / 建議身高155-160 / 建議體重40-50kg / 衣長68
+S：肩寬44 / 胸圍100 / 建議身高160-165 / 建議體重50-60kg / 衣長69.5
+M：肩寬45.5 / 胸圍105 / 建議身高165-170 / 建議體重60-70kg / 衣長71
+L：肩寬47 / 胸圍110 / 建議身高170-175 / 建議體重70-80kg / 衣長72.5
+XL：肩寬48.5 / 胸圍115 / 建議身高175-180 / 建議體重80-90kg / 衣長74
+XXL：肩寬50 / 胸圍120 / 建議身高180-185 / 建議體重90-100kg / 衣長75.5
+XXXL：肩寬51.5 / 胸圍125 / 建議身高185-190 / 建議體重100-110kg / 衣長77
+4XL：肩寬53 / 胸圍130 / 建議身高190-195 / 建議體重110-120kg / 衣長80`,
     note: ''
   },
 
@@ -322,7 +523,12 @@ const data = [
     catLabel: '急件',
     catColor: '#c0392b',
     q: '毛巾 / 方巾 / 頭巾 急件',
-    a: "急件費用：每條 80 元\n\n如果緊急的話就是每天中午前確認，每天下午寄出。\n但急件會有每條80元急件費用。\n\n✅ 客戶接受後要直接跟酷頂聯繫確認！",
+    a: `急件費用：每條 80 元
+
+如果緊急的話就是每天中午前確認，每天下午寄出。
+但急件會有每條80元急件費用。
+
+✅ 客戶接受後要直接跟酷頂聯繫確認！`,
     note: ''
   },
   {
@@ -330,7 +536,11 @@ const data = [
     catLabel: '急件',
     catColor: '#c0392b',
     q: '浴巾 急件',
-    a: "急件費用：每條 80 元\n\n即使客戶接受急件，只能每週三提前寄出。\n\n✅ 客戶接受後要直接跟酷頂聯繫確認！",
+    a: `急件費用：每條 80 元
+
+即使客戶接受急件，只能每週三提前寄出。
+
+✅ 客戶接受後要直接跟酷頂聯繫確認！`,
     note: ''
   },
   {
@@ -338,7 +548,15 @@ const data = [
     catLabel: '急件',
     catColor: '#c0392b',
     q: '行李箱套 急件',
-    a: "急件費用：150 元\n\n⚠️ 不一定能做，需要先跟酷頂確認後才能跟客戶收費。\n\n流程：\n1. 先跟酷頂確認時間，可以再收費\n2. 跟客戶收取 1279 + 150 元\n3. 收款後提供檔案給酷頂\n4. 看是要直接來公司出貨，或者直接寄給客人（以需求時間為主）",
+    a: `急件費用：150 元
+
+⚠️ 不一定能做，需要先跟酷頂確認後才能跟客戶收費。
+
+流程：
+1. 先跟酷頂確認時間，可以再收費
+2. 跟客戶收取 1279 + 150 元
+3. 收款後提供檔案給酷頂
+4. 看是要直接來公司出貨，或者直接寄給客人（以需求時間為主）`,
     note: ''
   },
   {
@@ -346,7 +564,9 @@ const data = [
     catLabel: '急件',
     catColor: '#c0392b',
     q: '衣服 急件',
-    a: "急件費用：100 元\n\n⚠️ 不一定能做，需要先跟膠膜確認才能承接。",
+    a: `急件費用：100 元
+
+⚠️ 不一定能做，需要先跟膠膜確認才能承接。`,
     note: ''
   },
 ];
@@ -441,49 +661,28 @@ function filterCards() {
 
 // Init
 renderCards();
+
+// Password protection
+function checkPw() {
+  var input = document.getElementById('pw-input').value;
+  if (input === 'f56602476') {
+    document.getElementById('pw-overlay').style.display = 'none';
+    sessionStorage.setItem('cs_auth', '1');
+  } else {
+    var el = document.getElementById('pw-input');
+    el.classList.add('error');
+    document.getElementById('pw-err').textContent = '密碼錯誤，請再試一次';
+    setTimeout(function(){ el.classList.remove('error'); }, 400);
+    el.value = '';
+  }
+}
+document.getElementById('pw-input').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') checkPw();
+});
+// Check session
+if (sessionStorage.getItem('cs_auth') === '1') {
+  document.getElementById('pw-overlay').style.display = 'none';
+}
 </script>
-<div id="img-section" style="max-width:900px; margin:30px auto; border-top:2px solid #e0e0e0; padding-top:24px;">
-<h2 style="color:#d35400; margin-bottom:8px;">&#128247; 客服圖片素材</h2>
-<p style="color:#888; font-size:13px; margin-bottom:20px;">點擊圖片可預覽，按下「下載」按鈕可儲存圖片後傳給客戶。</p>
-<div style="margin-bottom:24px;">
-<h3 style="color:#555; font-size:15px; margin-bottom:12px; border-left:4px solid #e67e22; padding-left:8px;">毛巾</h3>
-<div style="display:flex; flex-wrap:wrap; gap:12px;">
-<div style="text-align:center;"><img src="imgs/毛巾材質說明a.jpg" alt="毛巾材質說明a" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/毛巾材質說明a.jpg" download="毛巾材質說明a.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 毛巾材質說明a</a></div>
-<div style="text-align:center;"><img src="imgs/毛巾材質說明b.jpg" alt="毛巾材質說明b" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/毛巾材質說明b.jpg" download="毛巾材質說明b.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 毛巾材質說明b</a></div>
-<div style="text-align:center;"><img src="imgs/毛巾浴巾跟照片比例說明.jpg" alt="毛巾浴巾跟照片比例說明" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/毛巾浴巾跟照片比例說明.jpg" download="毛巾浴巾跟照片比例說明.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 毛巾浴巾跟照片比例說明</a></div>
-<div style="text-align:center;"><img src="imgs/長毛巾顏色選ㄙㄜˊ.jpg" alt="長毛巾顏色選ㄙㄜˊ" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/長毛巾顏色選ㄙㄜˊ.jpg" download="長毛巾顏色選ㄙㄜˊ.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 長毛巾顏色選ㄙㄜˊ</a></div>
-</div></div>
-<div style="margin-bottom:24px;">
-<h3 style="color:#555; font-size:15px; margin-bottom:12px; border-left:4px solid #e67e22; padding-left:8px;">行李箱套</h3>
-<div style="display:flex; flex-wrap:wrap; gap:12px;">
-<div style="text-align:center;"><img src="imgs/行李箱套調整說明.jpg" alt="行李箱套調整說明" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/行李箱套調整說明.jpg" download="行李箱套調整說明.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 行李箱套調整說明</a></div>
-</div></div>
-<div style="margin-bottom:24px;">
-<h3 style="color:#555; font-size:15px; margin-bottom:12px; border-left:4px solid #e67e22; padding-left:8px;">面紙</h3>
-<div style="display:flex; flex-wrap:wrap; gap:12px;">
-<div style="text-align:center;"><img src="imgs/面紙說明.jpg" alt="面紙說明" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/面紙說明.jpg" download="面紙說明.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 面紙說明</a></div>
-</div></div>
-<div style="margin-bottom:24px;">
-<h3 style="color:#555; font-size:15px; margin-bottom:12px; border-left:4px solid #e67e22; padding-left:8px;">寵物抱枕</h3>
-<div style="display:flex; flex-wrap:wrap; gap:12px;">
-<div style="text-align:center;"><img src="imgs/抱枕有白邊.jpg" alt="抱枕有白邊" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/抱枕有白邊.jpg" download="抱枕有白邊.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 抱枕有白邊</a></div>
-<div style="text-align:center;"><img src="imgs/抱枕無白邊.jpg" alt="抱枕無白邊" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/抱枕無白邊.jpg" download="抱枕無白邊.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 抱枕無白邊</a></div>
-<div style="text-align:center;"><img src="imgs/貓乾比例說明.jpg" alt="貓乾比例說明" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/貓乾比例說明.jpg" download="貓乾比例說明.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 貓乾比例說明</a></div>
-</div></div>
-<div style="margin-bottom:24px;">
-<h3 style="color:#555; font-size:15px; margin-bottom:12px; border-left:4px solid #e67e22; padding-left:8px;">小朋友衣服</h3>
-<div style="display:flex; flex-wrap:wrap; gap:12px;">
-<div style="text-align:center;"><img src="imgs/小朋友印製說明.jpg" alt="小朋友印製說明" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/小朋友印製說明.jpg" download="小朋友印製說明.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 小朋友印製說明</a></div>
-</div></div>
-<div style="margin-bottom:24px;">
-<h3 style="color:#555; font-size:15px; margin-bottom:12px; border-left:4px solid #e67e22; padding-left:8px;">常見問題</h3>
-<div style="display:flex; flex-wrap:wrap; gap:12px;">
-<div style="text-align:center;"><img src="imgs/出血說明.jpg" alt="出血說明" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/出血說明.jpg" download="出血說明.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 出血說明</a></div>
-<div style="text-align:center;"><img src="imgs/印製細緻說明.jpg" alt="印製細緻說明" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/印製細緻說明.jpg" download="印製細緻說明.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 印製細緻說明</a></div>
-<div style="text-align:center;"><img src="imgs/卡其色與米白色.jpg" alt="卡其色與米白色" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/卡其色與米白色.jpg" download="卡其色與米白色.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 卡其色與米白色</a></div>
-<div style="text-align:center;"><img src="imgs/夾鏈袋包裝示意.jpg" alt="夾鏈袋包裝示意" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/夾鏈袋包裝示意.jpg" download="夾鏈袋包裝示意.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 夾鏈袋包裝示意</a></div>
-<div style="text-align:center;"><img src="imgs/帽子實際顏色照片.jpg" alt="帽子實際顏色照片" style="max-width:160px; max-height:120px; border-radius:6px; border:1px solid #ddd; cursor:pointer; display:block; margin-bottom:6px;" onclick="window.open(this.src)" /><a href="imgs/帽子實際顏色照片.jpg" download="帽子實際顏色照片.jpg" style="display:inline-block; background:#f39c12; color:white; text-decoration:none; padding:5px 12px; border-radius:5px; font-size:12px;">&#11015; 帽子實際顏色照片</a></div>
-</div></div>
-</div>
 </body>
 </html>
